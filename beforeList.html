@@ -1,0 +1,87 @@
+<script>
+// These settings you can change to modify the report processing
+var UOM="px"; // Set to unit of measure for padding
+var INDENT_SIZE=1; // Set to indent padding step size. Setting to 1 means the padding steps are 1,2,3,4. These have to match the padding applied to the report objects
+var UOM_SIZE = UOM.length;
+function stripTrailing(string,num) {
+    if ( string == "") {return parseInt(0);} else {return parseInt(string.substring(0,string.length-num));}
+}
+
+function ExpandCollapse( el )
+{
+    // Grab the ROW that was clicked and the TABLE that contains it
+    var tr = el.parentElement.parentElement;
+    var tbl = tr.parentElement.parentElement;
+    // Set the alternating display values for hiding/showing the row
+    var sDisplay = ( el.src.indexOf( "minus" ) == -1 ) ? "" : "none";
+    var sDisplayReverse = ( el.src.indexOf( "minus" ) == -1 ) ? "none" : "";
+    //Switch the icon for the clicked row
+    el.src = "../pat/images/PropertyGroup_" + ( el.src.indexOf( "minus" ) == -1 ? "minus" : "plus" ) + ".gif";
+    // Starting with the row above the clicked row, start checking each row
+    for ( var i = tr.rowIndex - 1; i >1; i -- )
+    {
+        // Set the Current row indicator and the left padding value
+        var trCurrent = tbl.rows( i );
+        var trCurrentLeft = trCurrent.cells(0).style.paddingLeft;
+        // if the current row contains an IMG in it, it's a clickable level and we either have to stop processing,
+        // or reset the icons to a + as it's being collapsed
+        if ( trCurrent.cells( 0 ).firstChild && trCurrent.cells( 0 ).getElementsByTagName( "IMG" ).length )
+        {
+            // If the current row is at the same level or above in the tree, then stop processing,
+            // else reset all the signs below it, essentially collapsing all branches underneath the one that is beig collapsed.
+            if ( stripTrailing(trCurrentLeft , UOM_SIZE) <= stripTrailing(tr.cells(0).style.paddingLeft , UOM_SIZE) )
+            { break; }
+            else
+            {
+                if (el.src.indexOf( "minus" ) == -1 )
+                {
+                    trCurrent.cells(0).getElementsByTagName("IMG").item(0).src = "../pat/images/PropertyGroup_plus.gif";
+                }
+            }
+        }
+
+        // Now, we determine if the row should be hidden or shown.
+
+
+
+        if ( eval(stripTrailing(tr.cells(0).style.paddingLeft, UOM_SIZE) + INDENT_SIZE) < stripTrailing(trCurrentLeft, UOM_SIZE))// && el.src.indexOf( "minus" ) > 0 )
+        {
+            //trCurrent.style.display = sDisplayReverse;
+        } else
+        {
+            trCurrent.style.display = sDisplay;
+            if (sDisplay == "" && tbl.rows[i+1].cells.length-tbl.rows[i].cells.length==-2 && (!(tbl.rows[i].style.fontSize == "0px")))  
+            {
+                sDisplay = ""
+                trCurrent.style.display = sDisplay;
+                //tbl.rows[i].style.fontSize = "0.5px";
+                //tbl.rows[i].height = "1";
+                //alert(i + " sDisplay = " + sDisplay);
+            }
+
+            if (sDisplay == "" && tbl.rows[i+1].cells.length-tbl.rows[i].cells.length==-2 && tbl.rows[i].style.fontSize == "0px")  
+            {
+                sDisplay = ""
+                trCurrent.style.display = sDisplay;
+                tbl.rows[i].style.fontSize = "11px";
+                tbl.rows[i].height = "11";
+                //alert(i + " sDisplay = " + sDisplay);
+            }
+
+            if (sDisplay == "none" && tbl.rows[i+1].cells.length-tbl.rows[i].cells.length==-2)  
+            {
+                sDisplay = ""
+                trCurrent.style.display = sDisplay;
+                tbl.rows[i].style.fontSize = "0.5px";
+                tbl.rows[i].height = "1";
+            }
+
+
+
+
+
+        }
+    }        
+}
+
+</script>
